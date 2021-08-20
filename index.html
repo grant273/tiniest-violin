@@ -23,6 +23,7 @@
             height: 100%;
             /* remove the extra whites around */
             margin: 0;
+            position: fixed; /* disable scroll always on mobile (esp ios) */
         }
 
         #startContainer {
@@ -92,7 +93,7 @@
 <body class='no-select'>
     <div id="startContainer">
         <h1>The world's tiniest violin for the world's saddest problems</h1>
-        <button id="startBtn" onclick="this.parentNode.remove()">Begin Sulking</button>
+        <button id="startBtn">Begin Sulking</button>
     </div>
     <canvas id="myCanvas"></canvas>
     <img id="violin" src="img/violin2.svg" style="display: none;">
@@ -112,6 +113,7 @@
         });
   }
 
+
   let violinWidth = 50;
   let violinHeight = 100;
   let bowX = -999;
@@ -119,12 +121,16 @@
   let bowWidth = 100;
   let bowHeight = 10;
   let tapping = false;
-  let canvas, ctx, bowImg, violinImg, violinX, violinY, sadSong;
+  let canvas, ctx, bowImg, violinImg, violinX, violinY;
+  let sadSong = new Audio();
   let playing = false;
 
+  document.getElementById("startBtn").addEventListener("click", function onStart(e) {
+    sadSong.play(); // ios workaround
+    this.parentNode.remove()
+  });
   window.onload = function () {
     canvas = document.getElementById("myCanvas");
-    sadSong = document.getElementById("sadSong");
     canvas.width = document.body.clientWidth; //document.width is obsolete
     canvas.height = document.body.clientHeight; //document.height is obsolete
     ctx = canvas.getContext("2d");
@@ -149,8 +155,10 @@
       const violinYPlayCenter = violinY + violinHeight/5;
       const isColliding = Math.abs(violinX - bowX) < 153 && Math.abs(violinYPlayCenter - bowY) < 150;
       const shouldPlay = isColliding & tapping;
+      console.log(violinX, violinY, bowX, bowY);
       if (shouldPlay) {
         if (shouldPlay && !playing) {
+          sadSong.src = 'img/asadsong.mp3';  // ios workaround
           sadSong.play();
         }
         playing = true;
