@@ -37,11 +37,17 @@
             flex-direction: column;
             display: flex;
             text-align: center;
+            max-width: 450px;
+            width: 95vw;
         }
         #startContainer h1 {
             font-family: Serif;
-            width: 95vw;
             font-style: italic;
+            margin-bottom: 5px;
+        }
+        #startContainer small {
+            font-size: 0.5rem;
+            margin-bottom: 10px;
         }
         #startBtn {
             font-size: 3rem;
@@ -92,7 +98,8 @@
 
 <body class='no-select'>
     <div id="startContainer">
-        <h1>The world's tiniest violin for the world's saddest problems</h1>
+        <h1>"The world's tiniest violin for the world's saddest problems"</h1>
+        <small><a target="_blank" href="https://github.com/grant273/tiniest-violin">https://github.com/grant273/tiniest-violin</a></small>
         <button id="startBtn">Begin Sulking</button>
     </div>
     <canvas id="myCanvas"></canvas>
