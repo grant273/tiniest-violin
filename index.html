@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Tiniest Violin</title>
+    <meta name="author" content="Grant Klich">
+    <meta name="description" content="The world's tiniest violin for the world's saddest problem">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="theme-color" content="#000000">
+    <link rel="apple-touch-icon" href="icons/1/icon-192x192.png">
+    <link rel="manifest" href="manifest.json">
+    <script src="https://rawgit.com/Microsoft/TypeScript/master/lib/typescriptServices.js"></script>
+    <script src="https://rawgit.com/basarat/typescript-script/master/transpiler.js"></script>
+
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            /* remove the extra whites around */
+            margin: 0;
+        }
+
+        #startContainer {
+            background-color: #969696e8;
+            position: fixed;
+            left: 50%;
+            /* align-items: center; */
+            width: 100vw;
+            transform: translate(-50%, -50%);
+            top: 50%;
+            flex-direction: column;
+            display: flex;
+            text-align: center;
+        }
+        #startContainer h1 {
+            font-family: Serif;
+            width: 95vw;
+            font-style: italic;
+        }
+        #startBtn {
+            font-size: 3rem;
+            /*color: white;*/
+            /*background-color: #868176d6;*/
+        }
+        #myCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        * {
+            -webkit-tap-highlight-color: rgba(255, 255, 255, 0) !important;
+            -webkit-focus-ring-color: rgba(255, 255, 255, 0) !important;
+            outline: none !important;
+        }
+
+
+        .no-select {
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none; /* Safari */
+            -khtml-user-select: none; /* Konqueror HTML */
+            -moz-user-select: none; /* Old versions of Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none;
+            /* Non-prefixed version, currently
+                                     supported by Chrome, Opera and Firefox */
+        }
+
+        #startBtn{
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+        #startBtn:hover{
+             background-color:#4095c6;
+        }
+
+    </style>
+</head>
+
+<body class='no-select'>
+    <div id="startContainer">
+        <h1>The world's tiniest violin for the world's saddest problems</h1>
+        <button id="startBtn" onclick="this.parentNode.remove()">Begin Sulking</button>
+    </div>
+    <canvas id="myCanvas"></canvas>
+    <img id="violin" src="/img/violin2.svg" style="display: none;">
+    <img id="bow" src="/img/bow.png" style="display: none;">
+    <audio id="sadSong">
+        <source src="/img/asadsong.mp3" type="audio/ogg">
+        Your browser does not support the audio element.
+    </audio>
+<script src="js/lib/jquery.min.js"></script>
+</body>
+
+<script type="text/javascript">
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js')
+        .then(function () {
+          console.log('Service Worker Registered');
+        });
+  }
+
+  let violinWidth = 50;
+  let violinHeight = 100;
+  let bowX = -999;
+  let bowY = -999;
+  let bowWidth = 100;
+  let bowHeight = 10;
+  let tapping = false;
+  let canvas, ctx, bowImg, violinImg, violinX, violinY, sadSong;
+  let playing = false;
+
+  window.onload = function () {
+    canvas = document.getElementById("myCanvas");
+    sadSong = document.getElementById("sadSong");
+    canvas.width = document.body.clientWidth; //document.width is obsolete
+    canvas.height = document.body.clientHeight; //document.height is obsolete
+    ctx = canvas.getContext("2d");
+    bowImg = document.getElementById("bow");
+    violinImg = document.getElementById("violin");
+    violinX = canvas.width/2;
+    violinY = canvas.height/2;
+
+    function update() {
+      console.log("UPDATE");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(
+          violinImg,
+          violinX - violinWidth/2,
+          violinY - violinHeight/2,
+          violinWidth,
+          violinHeight
+      );
+
+      ctx.drawImage(bowImg, bowX -bowWidth/2, bowY - bowHeight/2, bowWidth, bowHeight);
+
+      // COLLISION DETECTION
+      const violinYPlayCenter = violinY + violinHeight/5;
+      const isColliding = Math.abs(violinX - bowX) < 153 && Math.abs(violinYPlayCenter - bowY) < 150;
+      const shouldPlay = isColliding & tapping;
+      console.log(tapping)
+      if (shouldPlay) {
+        if (shouldPlay && !playing) {
+          sadSong.play();
+        }
+        playing = true;
+      } else {
+        if (!shouldPlay && playing) {
+          sadSong.pause();
+          sadSong.currentTime = 0;
+        }
+        playing = false;
+      }
+    }
+
+    // TOUCHES
+    canvas.addEventListener('touchstart', function(event) {
+      tapping = true;
+      bowX = event.touches[0].clientX;
+      bowY = event.touches[0].clientY;
+
+    });
+    canvas.addEventListener('touchmove', function(event) {
+      bowX = event.targetTouches[0].clientX;
+      bowY = event.targetTouches[0].clientY;
+    });
+    canvas.addEventListener('touchend', function(event) {
+      tapping = false;
+    });
+
+    // MOUSE MOVEMENT
+    canvas.addEventListener('mousedown', function(event) {
+      tapping = true;
+    });
+    canvas.addEventListener('mousemove', function(event) {
+      bowX = event.offsetX;
+      bowY = event.offsetY;
+    });
+    canvas.addEventListener('mouseup', function(event) {
+      tapping = false;
+    });
+
+
+    setInterval(update, 1000/35); // fps
+  };
+</script>
+<script>
+
+
+</script>
+
+</html>
