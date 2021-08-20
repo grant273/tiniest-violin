@@ -2,7 +2,7 @@ var cacheName = 'numberstack';
 var filesToCache = [
 	'index.html',
 	'img/bow.png',
-	'img/violin2.png',
+	'img/violin2.svg',
 	'img/asadsong.mp3',
 
 ];
